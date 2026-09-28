@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        html, body {
+            height: 100%;
+        }
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+        }
+        #app {
+            flex: 1 0 auto;
+            display: flex;
+            flex-direction: column;
+        }
+        footer {
+            flex-shrink: 0;
+        }
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+        .navbar-brand {
+            font-weight: bold;
+        }
+        .dashboard-container {
+            padding: 2rem;
+        }
+        a {
+            color: #000000 !important;
+            text-decoration: none;
+        }
+        a:hover {
+            color: #333333 !important;
+            text-decoration: underline;
+        }
+        .nav-link {
+            color: #000000 !important;
+        }
+        .nav-link:hover {
+            color: #333333 !important;
+        }
+        .nav-link.active {
+            color: #000000 !important;
+            background-color: rgba(255, 255, 255, 0.2) !important;
+        }
+        .card a {
+            color: #000000 !important;
+            font-weight: 500;
+        }
+        .card a:hover {
+            color: #333333 !important;
+        }
+        .screen-container {
+            flex: 1 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+        .page-title {
+            color: #ffffff;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Login Screen -->
+        <div id="login-screen" class="screen-container">
+            <h1 class="page-title">💰 Financial Dashboard</h1>
+            <div class="card p-4" style="max-width: 400px; width: 100%;">
+                <h2 class="text-center mb-4">Login</h2>
+                <div id="login-error" class="alert alert-danger d-none"></div>
+                <form id="login-form">
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" id="login-email" required placeholder="seu@email.com">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Senha</label>
+                        <input type="password" class="form-control" id="login-password" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Entrar</button>
+                </form>
+                <div class="text-center mt-3">
+                    <a href="#" id="go-to-register">Não tem conta? Cadastre-se</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Register Screen -->
+        <div id="register-screen" class="screen-container d-none">
+            <h1 class="page-title">💰 Financial Dashboard</h1>
+            <div class="card p-4" style="max-width: 400px; width: 100%;">
+                <h2 class="text-center mb-4">Cadastro</h2>
+                <div id="register-error" class="alert alert-danger d-none"></div>
+                <form id="register-form">
+                    <div class="mb-3">
+                        <label class="form-label">Nome</label>
+                        <input type="text" class="form-control" id="register-name" required placeholder="Seu nome completo">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" id="register-email" required placeholder="seu@email.com">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Senha</label>
+                        <input type="password" class="form-control" id="register-password" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Criar conta</button>
+                </form>
+                <div class="text-center mt-3">
+                    <a href="#" id="go-to-login">Já tem conta? Faça login</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Screen -->
+        <div id="dashboard-screen" class="d-none flex-fill">
+            <nav class="navbar navbar-dark bg-dark mb-4">
+                <div class="container">
+                    <span class="navbar-brand">💰 Financial Dashboard</span>
+                    <button class="btn btn-outline-light" id="logout-btn">Sair</button>
+                </div>
+            </nav>
+
+            <div class="container dashboard-container">
+                <h1 class="mb-4">Bem-vindo, <span id="user-name"></span>!</h1>
+
+                <div id="dashboard-error" class="alert alert-danger d-none"></div>
+                <div id="dashboard-success" class="alert alert-success d-none"></div>
+
+                <ul class="nav nav-tabs mb-4" id="dashboard-tabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#converter" data-bs-toggle="tab">Conversor</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#quotes" data-bs-toggle="tab">Cotações</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#profile" data-bs-toggle="tab">Perfil</a>
+                    </li>
+                </ul>
+
+                <div class="tab-content">
+                    <!-- Converter Tab -->
+                    <div class="tab-pane fade show active" id="converter">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <h4>Converter BRL para USD</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <form id="convert-form">
+                                            <div class="mb-3">
+                                                <label class="form-label">Valor em Reais (BRL)</label>
+                                                <input type="number" step="0.01" class="form-control" id="amount-brl" required placeholder="Digite o valor em BRL">
+                                            </div>
+                                            <button type="submit" class="btn btn-primary">Converter</button>
+                                        </form>
+                                        <div id="conversion-result" class="mt-4 p-3 bg-light rounded d-none">
+                                            <h5>Resultado da Conversão</h5>
+                                            <p><strong>R$ <span id="result-brl"></span></strong> = <strong>$<span id="result-usd"></span></strong></p>
+                                            <p class="text-muted">Taxa utilizada: <span id="result-rate"></span></p>
+                                            <button class="btn btn-success" id="save-conversion-btn">Salvar Conversão</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <h4>Últimas Conversões</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="conversions-list" style="max-height: 400px; overflow-y: auto;">
+                                            <p class="text-muted">Nenhuma conversão salva ainda.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quotes Tab -->
+                    <div class="tab-pane fade" id="quotes">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <h4>Salvar Cotação</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label class="form-label">Par de Moedas</label>
+                                            <select class="form-select" id="currency-pair">
+                                                <option value="USDBRL">USD/BRL</option>
+                                                <option value="EURBRL">EUR/BRL</option>
+                                                <option value="GBPBRL">GBP/BRL</option>
+                                                <option value="JPYBRL">JPY/BRL</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <button type="button" class="btn btn-primary w-100" id="load-yahoo-btn">Carregar Taxa de Câmbio</button>
+                                        </div>
+                                        <div id="quote-rate-container" class="mb-3 d-none">
+                                            <label class="form-label">Taxa de Câmbio Atual</label>
+                                            <div class="input-group">
+                                                <input type="number" step="0.0001" class="form-control" id="quote-rate" readonly>
+                                                <span class="input-group-text">Yahoo Finance</span>
+                                            </div>
+                                        </div>
+                                        <div id="save-quote-container" class="d-none">
+                                            <button type="button" class="btn btn-success w-100" id="save-quote-btn">Salvar Cotação</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <h4>Cotações Salvas</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="quotes-list" style="max-height: 400px; overflow-y: auto;">
+                                            <p class="text-muted">Nenhuma cotação salva ainda.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Profile Tab -->
+                    <div class="tab-pane fade" id="profile">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h4>Meu Perfil</h4>
+                                    <button class="btn btn-outline-primary btn-sm" id="edit-profile-btn">Editar</button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div id="profile-view">
+                                    <p><strong>Nome:</strong> <span id="profile-name"></span></p>
+                                    <p><strong>Email:</strong> <span id="profile-email"></span></p>
+                                    <p><strong>ID:</strong> <span id="profile-id"></span></p>
+                                </div>
+                                <form id="profile-form" class="d-none">
+                                    <div class="mb-3">
+                                        <label class="form-label">Nome</label>
+                                        <input type="text" class="form-control" id="edit-name" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Email</label>
+                                        <input type="email" class="form-control" id="edit-email" required>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <button type="submit" class="btn btn-primary">Salvar</button>
+                                        <button type="button" class="btn btn-secondary" id="cancel-profile-btn">Cancelar</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center py-4">
+        <div class="container">
+            <p class="mb-0">Este projeto foi desenvolvido para fins acadêmicos por Evelyn Oliveira de Souza, estudante de pós graduação em Desenvolvimento Full Stack pela Puc Rio.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const API_URL = 'http://localhost:5000';
+        let currentUser = null;
+        let currentConversion = null;
+
+        // Navigation
+        document.getElementById('go-to-register').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('login-screen').classList.add('d-none');
+            document.getElementById('register-screen').classList.remove('d-none');
+        });
+
+        document.getElementById('go-to-login').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('register-screen').classList.add('d-none');
+            document.getElementById('login-screen').classList.remove('d-none');
+        });
+
+        // Login
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            try {
+                const response = await fetch(`${API_URL}/api/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    currentUser = data.user;
+                    showDashboard();
+                } else {
+                    showError('login-error', data.error);
+                }
+            } catch (error) {
+                showError('login-error', 'Erro ao conectar com o servidor');
+            }
+        });
+
+        // Register
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('register-name').value;
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+
+            try {
+                const response = await fetch(`${API_URL}/api/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password })
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    currentUser = data.user;
+                    showDashboard();
+                } else {
+                    showError('register-error', data.error);
+                }
+            } catch (error) {
+                showError('register-error', 'Erro ao conectar com o servidor');
+            }
+        });
+
+        // Logout
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            currentUser = null;
+            document.getElementById('dashboard-screen').classList.add('d-none');
+            document.getElementById('login-screen').classList.remove('d-none');
+        });
+
+        // Show Dashboard
+        function showDashboard() {
+            document.getElementById('login-screen').classList.add('d-none');
+            document.getElementById('register-screen').classList.add('d-none');
+            document.getElementById('dashboard-screen').classList.remove('d-none');
+            document.getElementById('user-name').textContent = currentUser.name;
+            loadConversions();
+            loadQuotes();
+            loadProfile();
+        }
+
+        // Convert
+        document.getElementById('convert-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const amountBrl = parseFloat(document.getElementById('amount-brl').value);
+
+            try {
+                const response = await fetch(`${API_URL}/api/convert`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount_brl: amountBrl })
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    currentConversion = data;
+                    document.getElementById('result-brl').textContent = data.amount_brl.toFixed(2);
+                    document.getElementById('result-usd').textContent = data.amount_usd.toFixed(2);
+                    document.getElementById('result-rate').textContent = data.rate;
+                    document.getElementById('conversion-result').classList.remove('d-none');
+                } else {
+                    showDashboardError(data.error);
+                }
+            } catch (error) {
+                showDashboardError('Erro ao converter');
+            }
+        });
+
+        // Save Conversion
+        document.getElementById('save-conversion-btn').addEventListener('click', async () => {
+            if (!currentConversion) return;
+
+            try {
+                const response = await fetch(`${API_URL}/api/conversions`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: currentUser.id,
+                        amount_brl: currentConversion.amount_brl
+                    })
+                });
+
+                if (response.ok) {
+                    showDashboardSuccess('Conversão salva com sucesso!');
+                    loadConversions();
+                    document.getElementById('conversion-result').classList.add('d-none');
+                    document.getElementById('amount-brl').value = '';
+                    currentConversion = null;
+                } else {
+                    const data = await response.json();
+                    showDashboardError(data.error);
+                }
+            } catch (error) {
+                showDashboardError('Erro ao salvar conversão');
+            }
+        });
+
+        // Load Conversions
+        async function loadConversions() {
+            try {
+                const response = await fetch(`${API_URL}/api/conversions/${currentUser.id}`);
+                const data = await response.json();
+
+                if (response.ok && data.conversions.length > 0) {
+                    const list = document.getElementById('conversions-list');
+                    list.innerHTML = data.conversions.map(conv => `
+                        <div class="card mb-2">
+                            <div class="card-body d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>R$ ${conv.amount_brl.toFixed(2)}</strong> = <strong>$${conv.amount_usd.toFixed(2)}</strong>
+                                    <br><small class="text-muted">Taxa: ${conv.rate.toFixed(2)} | ${new Date(conv.created_at).toLocaleString('pt-BR')}</small>
+                                </div>
+                                <button class="btn btn-danger btn-sm" onclick="deleteConversion(${conv.id})">Excluir</button>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Erro ao carregar conversões:', error);
+            }
+        }
+
+        // Delete Conversion
+        async function deleteConversion(id) {
+            try {
+                const response = await fetch(`${API_URL}/api/conversions/${id}`, { method: 'DELETE' });
+                if (response.ok) {
+                    showDashboardSuccess('Conversão excluída com sucesso!');
+                    loadConversions();
+                }
+            } catch (error) {
+                showDashboardError('Erro ao excluir conversão');
+            }
+        }
+
+        // Load Yahoo Finance
+        document.getElementById('load-yahoo-btn').addEventListener('click', async () => {
+            const currencyPair = document.getElementById('currency-pair').value;
+            const symbol = currencyPair + '=X';
+
+            try {
+                const response = await fetch(`${API_URL}/api/external/yahoo-finance/${symbol}`);
+                const data = await response.json();
+
+                if (response.ok && data.data && data.data.length > 0) {
+                    const latestRate = data.data[data.data.length - 1].close;
+                    document.getElementById('quote-rate').value = latestRate;
+                    document.getElementById('quote-rate-container').classList.remove('d-none');
+                    document.getElementById('save-quote-container').classList.remove('d-none');
+                    showDashboardSuccess('Taxa de câmbio carregada com sucesso!');
+                } else {
+                    showDashboardError('Erro ao carregar taxa de câmbio');
+                }
+            } catch (error) {
+                showDashboardError('Erro ao carregar taxa de câmbio');
+            }
+        });
+
+        // Save Quote
+        document.getElementById('save-quote-btn').addEventListener('click', async () => {
+            const currencyPair = document.getElementById('currency-pair').value;
+
+            try {
+                const response = await fetch(`${API_URL}/api/quotes`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: currentUser.id,
+                        currency_pair: currencyPair
+                    })
+                });
+
+                if (response.ok) {
+                    showDashboardSuccess('Cotação salva com sucesso!');
+                    loadQuotes();
+                    // Reset form
+                    document.getElementById('quote-rate-container').classList.add('d-none');
+                    document.getElementById('save-quote-container').classList.add('d-none');
+                    document.getElementById('quote-rate').value = '';
+                } else {
+                    const data = await response.json();
+                    showDashboardError(data.error);
+                }
+            } catch (error) {
+                showDashboardError('Erro ao salvar cotação');
+            }
+        });
+
+        // Load Quotes
+        async function loadQuotes() {
+            try {
+                const response = await fetch(`${API_URL}/api/quotes/${currentUser.id}`);
+                const data = await response.json();
+
+                if (response.ok && data.quotes.length > 0) {
+                    const list = document.getElementById('quotes-list');
+                    list.innerHTML = data.quotes.map(quote => `
+                        <div class="card mb-2">
+                            <div class="card-body d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>${quote.currency_pair}</strong>: ${quote.rate.toFixed(4)}
+                                    <br><small class="text-muted">${new Date(quote.created_at).toLocaleString('pt-BR')}</small>
+                                </div>
+                                <button class="btn btn-danger btn-sm" onclick="deleteQuote(${quote.id})">Excluir</button>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Erro ao carregar cotações:', error);
+            }
+        }
+
+        // Delete Quote
+        async function deleteQuote(id) {
+            try {
+                const response = await fetch(`${API_URL}/api/quotes/${id}`, { method: 'DELETE' });
+                if (response.ok) {
+                    showDashboardSuccess('Cotação excluída com sucesso!');
+                    loadQuotes();
+                }
+            } catch (error) {
+                showDashboardError('Erro ao excluir cotação');
+            }
+        }
+
+        // Profile
+        function loadProfile() {
+            document.getElementById('profile-name').textContent = currentUser.name;
+            document.getElementById('profile-email').textContent = currentUser.email;
+            document.getElementById('profile-id').textContent = currentUser.id;
+            document.getElementById('edit-name').value = currentUser.name;
+            document.getElementById('edit-email').value = currentUser.email;
+        }
+
+        document.getElementById('edit-profile-btn').addEventListener('click', () => {
+            document.getElementById('profile-view').classList.add('d-none');
+            document.getElementById('profile-form').classList.remove('d-none');
+        });
+
+        document.getElementById('cancel-profile-btn').addEventListener('click', () => {
+            document.getElementById('profile-view').classList.remove('d-none');
+            document.getElementById('profile-form').classList.add('d-none');
+        });
+
+        document.getElementById('profile-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('edit-name').value;
+            const email = document.getElementById('edit-email').value;
+
+            try {
+                const response = await fetch(`${API_URL}/api/users/${currentUser.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email })
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    currentUser = data.user;
+                    loadProfile();
+                    document.getElementById('profile-view').classList.remove('d-none');
+                    document.getElementById('profile-form').classList.add('d-none');
+                    showDashboardSuccess('Perfil atualizado com sucesso!');
+                } else {
+                    showDashboardError(data.error);
+                }
+            } catch (error) {
+                showDashboardError('Erro ao atualizar perfil');
+            }
+        });
+
+        // Utility functions
+        function showError(elementId, message) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.classList.remove('d-none');
+            setTimeout(() => element.classList.add('d-none'), 5000);
+        }
+
+        function showDashboardError(message) {
+            showError('dashboard-error', message);
+        }
+
+        function showDashboardSuccess(message) {
+            const element = document.getElementById('dashboard-success');
+            element.textContent = message;
+            element.classList.remove('d-none');
+            setTimeout(() => element.classList.add('d-none'), 5000);
+        }
+    </script>
+</body>
+</html>

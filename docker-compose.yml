@@ -1,0 +1,53 @@
+services:
+  # Módulo Database - SQLite
+  database:
+    build:
+      context: ./database
+      dockerfile: Dockerfile
+    container_name: financial-dashboard-db
+    volumes:
+      - ./database:/app
+      - financial_db_data:/app/data
+    networks:
+      - financial-network
+
+  # Módulo Backend - API REST com Flask
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: financial-dashboard-backend
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend:/app
+      - ./database:/app/../database
+    environment:
+      - FLASK_ENV=production
+      - SECRET_KEY=your-secret-key-change-in-production
+      - DATABASE_URL=sqlite:///../database/financial.db
+    depends_on:
+      - database
+    networks:
+      - financial-network
+
+  # Módulo Frontend - React com Nginx
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: financial-dashboard-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - financial-network
+
+networks:
+  financial-network:
+    driver: bridge
+
+volumes:
+  financial_db_data:
+    driver: local
